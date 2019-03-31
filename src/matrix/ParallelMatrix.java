@@ -65,27 +65,13 @@ public class ParallelMatrix extends Thread {
         System.out.println("Calculation completed in " +
                              (endTime - startTime) + " milliseconds");
         //----------------------------------------------------------------------
-
     }
     
-    
-    
     public void run() {
-//        int begin, end ;
-// 
-//        if (me == 0) {
-//            begin = 0 ;
-//            end = P/2 ;
-//        }
-//        else {  // me == 1
-//            begin = P/2 ;
-//            end = P ;
-//        }
 
         int begin = me * B ;
         int end = begin + B ;
   
-        
         // multiplication matrices...
         for (int i = begin; i < end; i++) {
            for (int j = 0; j < N; j++) {
