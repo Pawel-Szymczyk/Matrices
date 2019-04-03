@@ -16,56 +16,61 @@ package matrix;
 public class ParallelMatrix extends Thread {
     
     int me ;
-    final static int N = 1024; // size of Matrix       // N cannot be smaller than P 
+//    final static int N = 1024; // size of Matrix       // N cannot be smaller than P 
     //final static int N2 = 2;
-    final static int randomNumberScale = 100;           // if the scale is too large the nunmbers are out of memory scope
+//    final static int randomNumberScale = 10;           // if the scale is too large the nunmbers are out of memory scope
     
-    final static int P = 16; // number of threads;
+//    final static int P = 16; // number of threads;
     
-    static int matrix1[][] = new int[N][N];
-    static int matrix2[][] = new int[N][N];
+     int matrix1[][];// = new int[N][N];
+     int matrix2[][];// = new int[N][N];
+//    
+     int matrix[][];//=new int[N][N];
+   int N= 0;
+   int B = 0;//N / P ;  // thread block size
     
-    static int matrix[][]=new int[N][N];
-   
-    final static int B = N / P ;  // thread block size
-    
-    public ParallelMatrix(int me) {
+    public ParallelMatrix(int me,int n,int p,int m1[][] ,int m2[][],int res[][]) {
+        B = n/p;
         this.me = me ;
+        matrix1 = m1;
+        matrix2 = m2;
+        N = n;
+        matrix = res;//new int[N][N];
     }
     
-    public static void main(String[] args) throws Exception{
-                
-        // generate two random matrixes of size N
-        matrix1 = matrixGenerator(N,N);
-        matrix2 = matrixGenerator(N,N);
-        
-        printOutput(matrix1, "null");
-        printOutput(matrix2, "null");
-        
-        
-        //----------------------------------------------------------------------
-        // Benchmarking test
-        //
-        long startTime = System.currentTimeMillis();
-
-            ParallelMatrix [] threads = new ParallelMatrix [P] ;
-            for(int me = 0 ; me < P ; me++) {
-                threads [me] = new ParallelMatrix(me) ;
-                threads [me].start() ;
-            }
-  
-            for(int me = 0 ; me < P ; me++) {
-                threads [me].join() ;
-            }
-            
-            printOutput(matrix, "product");     
-        
-        long endTime = System.currentTimeMillis();
-  
-        System.out.println("Calculation completed in " +
-                             (endTime - startTime) + " milliseconds");
-        //----------------------------------------------------------------------
-    }
+//    public static void main(String[] args,) throws Exception{
+//                
+//        // generate two random matrixes of size N
+//        matrix1 = matrixGenerator(N,N);
+//        matrix2 = matrixGenerator(N,N);
+//        
+//        printOutput(matrix1, "null");
+//        printOutput(matrix2, "null");
+//        
+//        
+//        //----------------------------------------------------------------------
+//        // Benchmarking test
+//        //
+//        long startTime = System.currentTimeMillis();
+//
+//            ParallelMatrix [] threads = new ParallelMatrix [P] ;
+//            for(int me = 0 ; me < P ; me++) {
+//                threads [me] = new ParallelMatrix(me) ;
+//                threads [me].start() ;
+//            }
+//  
+//            for(int me = 0 ; me < P ; me++) {
+//                threads [me].join() ;
+//            }
+//            
+//            printOutput(matrix, "product");     
+//        
+//        long endTime = System.currentTimeMillis();
+//  
+//        System.out.println("Calculation completed in " +
+//                             (endTime - startTime) + " milliseconds");
+//        //----------------------------------------------------------------------
+//    }
     
     public void run() {
 
@@ -97,16 +102,16 @@ public class ParallelMatrix extends Thread {
     
     
     // generate a matrix
-    public static int[][] matrixGenerator(int rowsNo, int colNo) {
-        
-        int newMatrix[][] = new int [rowsNo][colNo];
-        for (int i=0; i<newMatrix.length; i++) {
-            for (int j=0; j<newMatrix[i].length; j++) {
-                newMatrix[i][j] = (int) (Math.random()*randomNumberScale);
-            } 
-        }
-        return newMatrix;
-    }
+//    public static int[][] matrixGenerator(int rowsNo, int colNo) {
+//        
+//        int newMatrix[][] = new int [rowsNo][colNo];
+//        for (int i=0; i<newMatrix.length; i++) {
+//            for (int j=0; j<newMatrix[i].length; j++) {
+//                newMatrix[i][j] = (int) (Math.random()*randomNumberScale);
+//            } 
+//        }
+//        return newMatrix;
+//    }
     
     // add matrices
     public static int[][] matrixSum(int[][] matrix1, int[][] matrix2) { 
