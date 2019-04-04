@@ -1,18 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package matrix;
 
 /**
  * @author up750825
  */
 public class Matrix {
-
-    static int N1 = 10;
-    static int N2 = 10;
-    static int randomNumberScale = 10;
     
     public Matrix() {}
         

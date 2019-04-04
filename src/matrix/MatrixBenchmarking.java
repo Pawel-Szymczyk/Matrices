@@ -8,9 +8,9 @@ public class MatrixBenchmarking {
     
     final static int N = 4;
     final static double randomNumberScale = 10;        
-//    final static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2,4,8,16,32));
-    final static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2,4));
-    final static String calculationsType = "addition";  //multiplication, addition, subtraction, dividing
+    final static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2,4,8,16,32));
+//    final static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2));
+    final static String calculationsType = "multiplication";  //multiplication, addition, subtraction, dividing
 
     static int count = 0;
     static int[][] matrix1;
@@ -29,8 +29,8 @@ public class MatrixBenchmarking {
         matrix2 = matrixGenerator(N,N);
         
         System.out.println("*******************************************************************");
-        printOutput(matrix1, "Matrix 1");
-        printOutput(matrix2, "Matrix 2");
+        //printOutput(matrix1, "Matrix 1");
+        //printOutput(matrix2, "Matrix 2");
         
         // Calculate sequential first.
         calculateSequential(calculationsType);
@@ -66,7 +66,7 @@ public class MatrixBenchmarking {
         long endTime = System.currentTimeMillis();
         sequential_time =  (endTime - startTime);
         
-        printOutput(Sequential_matrix, type);
+        //printOutput(Sequential_matrix, type);
 
         System.out.printf("Calculation completed in %.0f milliseconds", sequential_time);
         System.out.println("");
@@ -105,7 +105,7 @@ public class MatrixBenchmarking {
         
         float parallel_time = (endTime - startTime);
         
-        printOutput(matrix, type);
+        //printOutput(matrix, type);
 
         if(Arrays.deepEquals(Sequential_matrix,matrix)){
             System.out.printf("Calculation completed in %.0f milliseconds", parallel_time);
