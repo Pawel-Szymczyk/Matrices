@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package matrix;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +6,13 @@ import java.util.Arrays;
 
 public class MatrixBenchmarking {
     
-    
-    final static int N = 1024;
-    final static double randomNumberScale = 100;           
+    final static int N = 4;
+    final static double randomNumberScale = 10;        
+//    final static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2,4,8,16,32));
+    final static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2,4));
+    final static String calculationsType = "addition";  //multiplication, addition, subtraction, dividing
 
     static int count = 0;
-    static ArrayList<Integer> runs = new ArrayList<Integer>(Arrays.asList(2,4,8,16,32));
     static int[][] matrix1;
     static int[][] matrix2;
     static int[][] Sequential_matrix;
@@ -25,80 +20,116 @@ public class MatrixBenchmarking {
         
     public static void main(String[] args) throws Exception{
 
-           System.out.println("*******************************************************************");
+        System.out.println("*******************************************************************");
+        System.out.println("Calculations Type: " + calculationsType);
         System.out.println("Matrix size N x N: " + N);
         System.out.println("Max Generated No.: " + randomNumberScale);
 
         matrix1 = matrixGenerator(N,N);
         matrix2 = matrixGenerator(N,N);
         
-        calculateSequential();
+        System.out.println("*******************************************************************");
+        printOutput(matrix1, "Matrix 1");
+        printOutput(matrix2, "Matrix 2");
         
+        // Calculate sequential first.
+        calculateSequential(calculationsType);
     }
     
-    
-     public static void calculateSequential() throws InterruptedException{
-           System.out.println("*******************************************************************");
+    /**
+     * Performs sequential calculations.
+     * @param type type of performed calculations: multiplication, addition, subtraction, dividing
+     * @throws InterruptedException 
+     */
+    public static void calculateSequential(String type) throws InterruptedException{
+        System.out.println("*******************************************************************");
         System.out.println("Sequential: ");
 
         long startTime = System.currentTimeMillis();
 
-        Sequential_matrix = matrixMultiplication(matrix1, matrix2);
-
+        Matrix SeqeuntialMatrix = new Matrix();
+        switch(type) {
+            case "multiplication": 
+                Sequential_matrix = SeqeuntialMatrix.matrixMultiplication(matrix1, matrix2);
+                break;
+            case "addition": 
+                Sequential_matrix = SeqeuntialMatrix.matrixSum(matrix1, matrix2);
+                break;
+            case "subtraction":
+                Sequential_matrix = SeqeuntialMatrix.matrixSubtract(matrix1, matrix2);
+                break;
+            case "dividing": 
+               // Sequential_matrix = SeqeuntialMatrix.matrixDivide(matrix1, matrix2);
+                break;
+        }
         
-         long endTime = System.currentTimeMillis();
-         sequential_time =  (endTime - startTime);
+        long endTime = System.currentTimeMillis();
+        sequential_time =  (endTime - startTime);
+        
+        printOutput(Sequential_matrix, type);
 
         System.out.printf("Calculation completed in %.0f milliseconds", sequential_time);
         System.out.println("");
-        calculateParallel(runs.get(count));
         
-     }
+        // Calculate parallel after sequential.
+        calculateParallel(runs.get(count), calculationsType);
+        
+    }
 
-    
-        public static void calculateParallel(int no_threads) throws InterruptedException{
+    /**
+     * Performs parallel calculations based on threads.
+     * @param no_threads - number of threads 
+     * @param type - type of performed calculations: multiplication, addition, subtraction, dividing
+     * @throws InterruptedException 
+     */
+    public static void calculateParallel(int no_threads, String type) throws InterruptedException{
 
-           System.out.println("*******************************************************************");
-           System.out.println("No. of Threads: " + runs.get(count));
-            
-           int matrix[][] = new int[N][N];
-           
-           long startTime = System.currentTimeMillis();
+        System.out.println("*******************************************************************");
+        System.out.println("No. of Threads: " + runs.get(count));
 
-               ParallelMatrix [] threads = new ParallelMatrix[no_threads];
-               for(int me = 0 ; me < no_threads ; me++) {
-                   threads [me] = new ParallelMatrix(me,N,no_threads,matrix1,matrix2,matrix) ;
-                   threads [me].start() ;
-               }
+        int matrix[][] = new int[N][N];
 
-               for(int me = 0 ; me < no_threads ; me++) {
-                   threads [me].join();
-               }
+        long startTime = System.currentTimeMillis();
 
+            ParallelMatrix [] threads = new ParallelMatrix[no_threads];
+            for(int me = 0 ; me < no_threads ; me++) {
+                threads [me] = new ParallelMatrix(me,N,no_threads,matrix1,matrix2,matrix, type) ;
+                threads [me].start() ;
+            }
 
-           long endTime = System.currentTimeMillis();
+            for(int me = 0 ; me < no_threads ; me++) {
+                threads [me].join();
+            }
 
-           float parallel_time = (endTime - startTime);
-           
-           if(Arrays.deepEquals(Sequential_matrix,matrix)){
-               System.out.printf("Calculation completed in %.0f milliseconds", parallel_time);
-               System.out.println("");
+        long endTime = System.currentTimeMillis();
+        
+        float parallel_time = (endTime - startTime);
+        
+        printOutput(matrix, type);
 
-               float parallel_speed_up = sequential_time/parallel_time;
-               System.out.printf("Parallel Speed_ Up %.2f", parallel_speed_up);
-                System.out.println("");
-           }else{
-               System.out.println("Parallel Matrix NOT equal Sequential Matrix");
-           }
-           
-            count++;           
-           if(count <= runs.size()-1){
-            calculateParallel(runs.get(count));
-           }
-          
+        if(Arrays.deepEquals(Sequential_matrix,matrix)){
+            System.out.printf("Calculation completed in %.0f milliseconds", parallel_time);
+            System.out.println("");
+
+            float parallel_speed_up = sequential_time/parallel_time;
+            System.out.printf("Parallel Speed_ Up %.2f", parallel_speed_up);
+            System.out.println("");
+        }else{
+            System.out.println("Parallel Matrix NOT equal Sequential Matrix");
         }
+
+        count++;           
+        if(count <= runs.size()-1){
+            calculateParallel(runs.get(count), calculationsType);
+        }
+    }
         
-        
+    /**
+     * Generate random matrix (2D arrays)
+     * @param rowsNo - matrix number of rows
+     * @param colNo - matrix number of columns
+     * @return matrix
+     */
     public static int[][] matrixGenerator(int rowsNo, int colNo) {
         
         int newMatrix[][] = new int[rowsNo][colNo];
@@ -111,33 +142,20 @@ public class MatrixBenchmarking {
         return newMatrix;
     }
     
-    
-        public static int[][] matrixMultiplication(int[][] matrix1, int[][] matrix2) {
+    /**
+     * Print out matrix.
+     * @param matrix - matrix (2D array)
+     * @param type - type of performed calculations: multiplication, addition, subtraction, dividing
+     */
+    public static void printOutput(int[][] matrix, String type) {
         
-        int matrix1Row = matrix1.length;
-        int matrix1Col = matrix1[0].length;
-        int matrix2Col = matrix2[0].length;
-        
-        int matrix[][]=new int[matrix1Row][matrix2Col];
-        
-        for (int i = 0; i < matrix1Row; i++) {
-           for (int j = 0; j < matrix2Col; j++) {
-               for (int k = 0; k < matrix1Col; k++) {
-                   matrix[i][j] = matrix[i][j] + matrix1[i][k] * matrix2[k][j];
-               }
+        System.out.printf("%s of A and B is: ", type);
+        System.out.println("");
+        for (int i = 0; i < matrix.length; i++) {
+           for (int j = 0; j < matrix[0].length; j++) {
+               System.out.print(matrix[i][j] + " ");                 
            }
+           System.out.println();
         }
-        
-        return matrix;
     }
-    
 }
-
-
-
-
-
-
-
-
-
